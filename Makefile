@@ -7,7 +7,7 @@ RM=rm -r -f
 # FOLDERS
 SRC_FOLDER=src/
 BIN_FOLDER=bin/
-INPUT_FOLDER=../images/
+INPUT_FOLDER=input/
 OUTPUT_FOLDER=output/
 
 # SRCs and OBJs

@@ -12,7 +12,6 @@ OUTPUT_FOLDER=output/
 
 # SRCs and OBJs
 SRC = $(wildcard $(SRC_FOLDER)/*.py)
-TEST=$(BIN_FOLDER)/test.py
 MAIN=$(BIN_FOLDER)/main.py
 
 # BUILD COMMAND

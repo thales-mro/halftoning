@@ -1,0 +1,55 @@
+image: adnrv/opencv
+
+# Some variables to make your CI DRY
+variables:
+  FILE: "bin/main.py"
+
+before_script:
+  # Execute any scripts here before running your code
+
+stages:
+  - build
+  - exec
+  - report
+
+build:
+  stage: build
+  script:
+    - make build
+  artifacts:
+    paths:
+      - $FILE
+
+# This stage executes our program (previously compiled)
+exec:
+  stage: exec
+  script:
+    # Note that instead of the makefile you can just call your executable here
+    - make exec
+  # artifacts:
+  #   paths:
+  #     - output/o-2-a-0.jpg
+  #     - output/o-2-b-0.jpg
+  #     - output/o-2-c-0.jpg
+  #     - output/o-5-a-0.jpg
+  #     - output/o-5-b-0.jpg
+  #     - output/o-3-0.jpg
+  #     - output/o-3-1.jpg
+  #     - output/o-4-b-0.jpg
+  #     - output/o-4-c-0.jpg
+  #     - output/o-4-c-1.jpg
+
+report:
+  image: adnrv/texlive:full
+  stage: report
+  script:
+    - ls
+    - cd report
+    - latexmk -pdf -pdflatex="pdflatex --shell-escape %O %S" report
+    # move the file to the root folder
+    - mv report.pdf ../
+  artifacts:
+    paths:
+      - report.pdf
+  dependencies:
+    - exec

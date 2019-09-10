@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from halftoning import halftoning
 
 def open_image(name, grayscale=0):
@@ -32,18 +33,21 @@ def main():
     """
     Entrypoint for the code of project 01 MO443/2s2019
     """
-    print("Hey!")
+
     images = [
-        'baboon',
-        'monalisa',
-        'peppers',
-        'watch'
+        'baboon'#,
+        #'monalisa',
+        #'peppers',
+        #'watch'
     ]
+    arr = np.array([[1, 200, 189], [244, 5, 6]])
 
     for image_name in images:
         image = open_image(image_name)
         image_grayscale = open_image(image_name, 1)
         #save grayscale image
-        save_image('test', image_grayscale)
+        ht = halftoning(image_grayscale, 0)
+        #halftoning(image[:, :, 0], 0)
+        save_image('test', ht)
 
 main()

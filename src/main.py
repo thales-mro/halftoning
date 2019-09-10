@@ -35,10 +35,10 @@ def main():
     """
 
     images = [
-        'baboon'#,
-        #'monalisa',
-        #'peppers',
-        #'watch'
+        'baboon',
+        'monalisa',
+        'peppers',
+        'watch'
     ]
     arr = np.array([[1, 200, 189], [244, 5, 6]])
 
@@ -46,8 +46,8 @@ def main():
         image = open_image(image_name)
         image_grayscale = open_image(image_name, 1)
         #save grayscale image
-        ht = halftoning(image_grayscale, 0)
+        ht = halftoning(image_grayscale, 5, 0)
         #halftoning(image[:, :, 0], 0)
-        save_image('test', ht)
+        save_image(image_name, ht)
 
 main()

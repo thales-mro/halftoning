@@ -69,9 +69,11 @@ def main():
 
         if benchmarking:
             print(image_name + " execution time:")
+
         # for every error propagation method,
         # it generates halftoning version of the image in color and grayscale
         for method in error_propagation_methods:
+
             # for every sweep method, generates the desired versions
             for sweep_name, order in sweep_order.items():
                 # performs the halftoning method for the 3 channels of the colored image

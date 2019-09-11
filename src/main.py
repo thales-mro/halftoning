@@ -36,9 +36,9 @@ def main():
 
     images = [
         'baboon',
-        #'monalisa',
-        #'peppers',
-        #'watch'
+        'monalisa',
+        'peppers',
+        'watch'
     ]
     arr = np.array([[250, 20, 120, 170, 0, 255, 0], [100, 200, 220, 15, 30, 50, 160]])
 
@@ -46,12 +46,12 @@ def main():
         image = open_image(image_name)
         image_grayscale = open_image(image_name, 1)
         colored_ht = np.zeros_like(image)
-        # colored_ht[:,:,0] = halftoning(image[:,:,0], 0, 1)
-        # colored_ht[:,:,1] = halftoning(image[:,:,1], 0, 1)
-        # colored_ht[:,:,2] = halftoning(image[:,:,2], 0, 1)
-        ht = halftoning(image_grayscale, 2, -1)
+        colored_ht[:,:,0] = halftoning(image[:,:,0], 0, 1)
+        colored_ht[:,:,1] = halftoning(image[:,:,1], 0, 1)
+        colored_ht[:,:,2] = halftoning(image[:,:,2], 0, 1)
+        ht = halftoning(image_grayscale, 5, 1)
         #halftoning(image[:, :, 0], 0)
         save_image(image_name, ht)
-        #save_image(image_name + "_colored", colored_ht)
+        save_image(image_name + "_colored", colored_ht)
 
 main()

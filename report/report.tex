@@ -72,7 +72,7 @@ The project has a Makefile available to help performing some actions on it. The 
 
 \subsection{Input}
 
-The program don't have an input argument by default, the input images are listed in code, and they are expected to be stored in the \textbf{input} folder. Listing \ref{code:input} shows how images are listed to be executed in code. The $images$ tuple is implemented in $src/main.py$
+The program does not have an input argument by default, the input images are listed in code, and they are expected to be stored in the \textbf{input} folder. Listing \ref{code:input} shows how images are listed to be executed in code. The $images$ tuple is implemented in $src/main.py$
 
 \begin{lstlisting}[language=Python, caption={Input images inside code}, label={code:input}]
   # for inserting other images, add tem to /input folder and list them here
@@ -165,6 +165,27 @@ def apply_halftoning(img, err_method="floyd-steinberg", sweep_method=1, benchmar
   return result*255
 
 \end{lstlisting}
+The decisions made in the implementation are explained in the following part.
+\subsubsection{Dealing with sweeping directions}
+In this solution, it was implemented two approaches: sweeping every line from left to right, and alternating directions when changing from one line to the other. Figure \ref{fig:sweepingmodes} shows the approaches. If the second mentioned method is chosen, the error diffusion mask has to be mirroed in the vertical direction. In other to avoid \textit{if-else} statements when deciding whether mask to use for the specific line (the regular or the mirroed one), the tuple \textit{m} holds both masks, and decide which one to use based on the \textit{direction} flag (if \textit{direction} is 1, use the regular mask. If it is -1, use the mirroed one). To sweep the image from right to left, it is also considered the indexes in the loop to decrease. Following the same idea of tuple \textit{m}, the tuple \textit{sweep\_options} is used to set the starting index, the stop index, and the \textit{direction} flag as step.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{images/sw-left-to-right.png}
+  \includegraphics[width=0.4\hsize]{images/sw-alternate.png}
+  \label{fig:sweepingmodes}
+  \caption{Left: Sweeping from left to right. Right: Sweeping alternated}
+\end{figure}
+
+\subsubsection{Image Padding to deal with borders}
+In order to deal with pixels in the border of the image, to diffuse the error, the image is padded as the mask propagates the error to its neighbors, as they may not exist for pixels in the border. The padding is done based on the mask properties, such as not diffusing errors to already visited pixels and the dimensions of each mask. The values padded does not matter, as they are not visited.
+
+\subsubsection{Defining the value of the pixel and the error diffusion}
+The main ideia of the halftoning algorithm is the following: rather than a simple binarization, in order to create the "feeling" of having more than 2 intensities of a color in the image, an analyzed pixel propagates its information to specific close neighbors. This propagation of information is what we define as error diffusion. Based on a threshold which defines whether a pixel has the maximum or minimum intensity, the resulting pixel value is defined and the error is calculates and passed through specific neighbors with specific weights. That weight is what is defined in the error diffusion masks. The error diffused for the neighbor pixels is proportional to the mentioned weight. After performing these steps to all pixels in the image, the process is done. The steps are the ones inside the two \textit{for} statements in listing \ref{code:halftoning}. They were implemented based on Algorithm 5, presented on the \textit{Enhancement} class of MO443: Introduction to Digital Image Processing course.  
+
+\subsubsection{Sweeping the image}
+To perform the visit of every pixel, as seen in listing \ref{code:halftoning}, it is used 2 nested \textit{for} statements. As the author was unable to vectorize the error propagation, the execution time occours in the second scale. To defined the value of the analyzed pixel in the iteration, an  offset is used, as the 
+
 %  \begin{lstlisting}[language=Python, caption={Nearest neighbor interpolation function.}, label={code:nninterpolation}]
 % def resize(img, shape):
 %     ...

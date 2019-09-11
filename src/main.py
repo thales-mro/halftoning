@@ -1,16 +1,16 @@
 import cv2
 import numpy as np
-from halftoning import halftoning
+from halftoning import apply_halftoning
 
-def open_image(name, grayscale=0):
+def open_image(name, grayscale=False):
     """
     it makes calls for openCV functions for reading an image based on a name
 
     Keyword arguments:
     name -- the name of the image to be opened
     grayscale -- whether image is opened in grayscale or not
-        0 (default): image opened normally (with all 3 color channels)
-        1: image opened in grayscale form
+        False (default): image opened normally (with all 3 color channels)
+        True: image opened in grayscale form
     """
     img_name = 'input/' + name + '_colored' + '.png'
     if grayscale:
@@ -32,26 +32,51 @@ def save_image(name, image):
 def main():
     """
     Entrypoint for the code of project 01 MO443/2s2019
+
+    For every input image, it generates the colored and grayscale halftoning versions of images,
+    varying the error propagation methods and the sweep order in image
     """
 
-    images = [
+    # for inserting other images, add tem to /input folder and list them here
+    images = (
         'baboon',
         'monalisa',
         'peppers',
         'watch'
-    ]
-    arr = np.array([[250, 20, 120, 170, 0, 255, 0], [100, 200, 220, 15, 30, 50, 160]])
+    )
 
+    error_propagation_methods = (
+        'floyd-steinberg',
+        'stevenson-arce',
+        'burkes',
+        'sierra',
+        'stucki',
+        'jarvis-judice-ninke'
+    )
+
+    sweep_order = {
+        'left-to-right': 1,
+        'alternate': -1
+    }
+
+    # for every image, loads the original (colored) and grayscale versions
     for image_name in images:
         image = open_image(image_name)
-        image_grayscale = open_image(image_name, 1)
-        colored_ht = np.zeros_like(image)
-        colored_ht[:,:,0] = halftoning(image[:,:,0], 0, 1)
-        colored_ht[:,:,1] = halftoning(image[:,:,1], 0, 1)
-        colored_ht[:,:,2] = halftoning(image[:,:,2], 0, 1)
-        ht = halftoning(image_grayscale, 5, 1)
-        #halftoning(image[:, :, 0], 0)
-        save_image(image_name, ht)
-        save_image(image_name + "_colored", colored_ht)
+        image_grayscale = open_image(image_name, True)
+        # for every error propagation method,
+        # it generates halftoning version of the image in color and grayscale
+        for method in error_propagation_methods:
+            # for every sweep method, generates the desired versions
+            for sweep_name, order in sweep_order.items():
+                # performs the halftoning method for the 3 channels of the colored image
+                colored_ht = np.zeros_like(image)
+                colored_ht[:, :, 0] = apply_halftoning(image[:, :, 0], method, order)
+                colored_ht[:, :, 1] = apply_halftoning(image[:, :, 1], method, order)
+                colored_ht[:, :, 2] = apply_halftoning(image[:, :, 2], method, order)
+                #performs the halftoning method for the grayscale version of image
+                gs_ht = apply_halftoning(image_grayscale, method, order)
+                # save generated images
+                save_image(image_name + "_colored_" + method + "_" + sweep_name, colored_ht)
+                save_image(image_name + "_grayscale_" + method + "_" + sweep_name, gs_ht)
 
 main()

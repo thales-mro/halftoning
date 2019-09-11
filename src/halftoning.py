@@ -24,45 +24,8 @@ MASKS = {"floyd-steinberg": np.array([[0, 0, 7/16], [3/16, 5/16, 1/16]]),
                                           [3/48, 5/48, 7/48, 5/48, 3/48],
                                           [1/48, 3/48, 5/48, 3/48, 1/48]])
 }
-def sweep(img, mask, sm):
-    """
-    It applies Floyd and Steinberg technique for error distribution
-    The F-S mask is a 2x3 one, so appropriate padding has to be done 
-    """
-    start = time.time()
-    result = np.zeros_like(img)
-    mask_h, mask_w = mask.shape
-    offset = mask_w//2
-    img_padded = np.pad(img, ((0, mask_h - 1), (mask_w//2, mask_w//2)), 'constant')
-    m = (mask, np.flip(mask, 1))
-    direction = 1
-    for j in range(img.shape[0]):
-        if direction > 0:
-            beginning = 0
-            end = img.shape[1]
-            mask_idx = 0
-        else:
-            beginning = img.shape[1] - 1
-            end = 0
-            mask_idx = 1
-        for i in range(beginning, end, direction):
-            if img_padded[j][(i + offset)] < 128:
-                result[j][i] = 0
-            else:
-                result[j][i] = 1
 
-            error = img_padded[j][(i + offset)] - result[j][i]*255
-            img_padded[j:j+mask_h, i:i+mask_w] = (img_padded[j:j+mask_h, i:i+mask_w] + (error*m[mask_idx])).astype(np.uint8)
-        direction *= sm
-        
-    result = result*255
-
-    end = time.time()
-    print(end - start)
-
-    return result
-
-def apply_halftoning(img, err_method="floyd-steinberg", sweep_method=1):
+def apply_halftoning(img, err_method="floyd-steinberg", sweep_method=1, benchmarking=False):
     """
     halftoning function implements the main algorithm of halftoning to an input image.
 
@@ -80,14 +43,60 @@ def apply_halftoning(img, err_method="floyd-steinberg", sweep_method=1):
         1 (default): image is sweeped from left to right, all lines
         -1: image is sweeped alternated, from left to right,
         then from right to left when line changes
+    benchmarking -- it prints the execution time of operation when desired
+        False: it doesn't print
+        True: it does print
     """
+    start = time.time()
 
+    # initialize result array
+    result = np.zeros_like(img)
+    # separates the masks that could be used
+    # (it needs the flip version of mask for alternated sweep)
+    m = (MASKS[err_method], np.flip(MASKS[err_method], 1))
+    # saves mask dimensions to be used when needed
+    mask_h, mask_w = m[0].shape
+    # saves image dimensions to be used when needed
+    img_h, img_w = img.shape
+    # it holds the offset of manipulated pixel related to mask
+    offset = mask_w//2
+    # applies padding to image to make it easier the operations with mask
+    img_padded = np.pad(img, ((0, mask_h - 1), (mask_w//2, mask_w//2)), 'constant')
 
-    if sweep_method == 0:
-        print("Line per line. Easier to implement.")
-    else:
-        print("Damn. That's hard.")
+    # default starting direction (left to right)
+    direction = 1
+    # it sweeps the image from top to bottom
+    for j in range(img_h):
+        # it sweeps the image from left to right or right to left depending on direction
+        if direction > 0:
+            beginning = 0
+            end = img_w
+            mask_idx = 0
+        else:
+            beginning = img_w - 1
+            end = 0
+            mask_idx = 1
+        # do the horizontal sweeping
+        for i in range(beginning, end, direction):
+            # depending on analyzed pixel, set its result value according to threshold
+            if img_padded[j][(i + offset)] < 128:
+                result[j][i] = 0
+            else:
+                result[j][i] = 1
 
-    fs = sweep(img, MASKS[err_method], sweep_method)
+            # calculates associated error
+            error = img_padded[j][(i + offset)] - result[j][i]*255
+            # propagates error according to mask
+            img_padded[j:j+mask_h, i:i+mask_w] = (img_padded[j:j+mask_h, i:i+mask_w] + (error*m[mask_idx])).astype(np.uint8)
+        # it changes from left to right to right to left (vice-versa) depending on the sweep method
+        direction *= sweep_method
+   
+    # scale the result
+    result = result*255
 
-    return fs
+    # prints execution time if needed
+    end = time.time()
+    if benchmarking:
+        print("\t " + str(end - start))
+
+    return result

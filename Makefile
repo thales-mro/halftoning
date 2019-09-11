@@ -22,7 +22,7 @@ build:
 # RUN COMMAND
 exec:
 	$(MKDIR) $(OUTPUT_FOLDER)
-	$(PYTHON) $(MAIN) -a $(INPUT_FOLDER) -o $(OUTPUT_FOLDER) #here you can add more args
+	$(PYTHON) $(MAIN)
 
 # CLEAN COMMAND
 clean:

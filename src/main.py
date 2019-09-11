@@ -59,10 +59,16 @@ def main():
         'alternate': -1
     }
 
+    #in case it is desired to analyze the execution time of each halftoning operation
+    benchmarking = True
+
     # for every image, loads the original (colored) and grayscale versions
     for image_name in images:
         image = open_image(image_name)
         image_grayscale = open_image(image_name, True)
+
+        if benchmarking:
+            print(image_name + " execution time:")
         # for every error propagation method,
         # it generates halftoning version of the image in color and grayscale
         for method in error_propagation_methods:
@@ -70,11 +76,11 @@ def main():
             for sweep_name, order in sweep_order.items():
                 # performs the halftoning method for the 3 channels of the colored image
                 colored_ht = np.zeros_like(image)
-                colored_ht[:, :, 0] = apply_halftoning(image[:, :, 0], method, order)
-                colored_ht[:, :, 1] = apply_halftoning(image[:, :, 1], method, order)
-                colored_ht[:, :, 2] = apply_halftoning(image[:, :, 2], method, order)
+                colored_ht[:, :, 0] = apply_halftoning(image[:, :, 0], method, order, benchmarking)
+                colored_ht[:, :, 1] = apply_halftoning(image[:, :, 1], method, order, benchmarking)
+                colored_ht[:, :, 2] = apply_halftoning(image[:, :, 2], method, order, benchmarking)
                 #performs the halftoning method for the grayscale version of image
-                gs_ht = apply_halftoning(image_grayscale, method, order)
+                gs_ht = apply_halftoning(image_grayscale, method, order, benchmarking)
                 # save generated images
                 save_image(image_name + "_colored_" + method + "_" + sweep_name, colored_ht)
                 save_image(image_name + "_grayscale_" + method + "_" + sweep_name, gs_ht)

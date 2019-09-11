@@ -6,32 +6,43 @@ import numpy as np
 import cv2
 import time
 
-def sweep(img, mask):
+def sweep(img, mask, sm):
     """
     It applies Floyd and Steinberg technique for error distribution
     The F-S mask is a 2x3 one, so appropriate padding has to be done  
     """
     start = time.time()
     result = np.zeros_like(img)
-    #print(result.shape)
-    #kernel = np.array([[0, 0, 7/16], [3/16, 5/16, 1/16]])
     mask_h, mask_w = mask.shape
     offset = mask_w//2
-    print(mask.shape, offset)
     img_padded = np.pad(img, ((0, mask_h - 1), (mask_w//2, mask_w//2)), 'constant')
-    # print(result.shape)
-
+    masks = (mask, np.flip(mask, 1))
+    direction = 1
     for j in range(img.shape[0]):
-        for i in range(img.shape[1]):
-
-            #result[j][i] = 0 if img_padded[j][i + offset] < 128 else 0
-            if img_padded[j][i + offset] < 128:
+        if direction > 0:
+            beginning = 0
+            end = img.shape[1]
+        else:
+            beginning = img.shape[1] - 1
+            end = 0
+        #print(beginning, end, direction)
+        for i in range(beginning, end, direction):
+            #print(i, img_padded[j][(i + offset)])
+            if img_padded[j][(i + offset)] < 128:
                 result[j][i] = 0
             else:
                 result[j][i] = 1
 
-            error = img_padded[j][i + offset] - result[j][i]*255
-            img_padded[j:j+mask_h, i:i+mask_w] += (mask*error).astype(np.uint8)
+            error = img_padded[j][(i + offset)] - result[j][i]*255
+            if direction > 0:
+                img_padded[j:j+mask_h, i:i+mask_w] = (img_padded[j:j+mask_h, i:i+mask_w] + (error*masks[0])).astype(np.uint8)
+                #print(img_padded)
+            else:
+                #print(img_padded[j:j+mask_h, i: i + mask_w])
+                img_padded[j:j+mask_h, i: i + mask_w] = img_padded[j:j+mask_h, i: i + mask_w] + (error*masks[1]).astype(np.uint8)
+        #print("------------------")
+        direction *= sm
+        #offset *= sm
     result = result*255
 
 
@@ -40,19 +51,7 @@ def sweep(img, mask):
 
     return result
 
-    # for j in range(result.shape[0]):
-    #     np.where(img_padded[j] < 128, print("Oi"), print("Tchau!"))
-    #     result[j] = np.where(img[j] < 128, 0, 1)
-    # result = result*255
-    # print(result)
-    # end = time.time()
-    # print(end - start)
-
-    # return result
-
-
-
-def halftoning(img, err_method=0, sweep_method=0):
+def halftoning(img, err_method=0, sweep_method=1):
     """ 
     halftoning function implements the main algorithm of halftoning to an input image.
 
@@ -67,8 +66,8 @@ def halftoning(img, err_method=0, sweep_method=0):
         5: Jarvis, Judice and Ninke mask
     sweep_method -- how the image is going to be sweeped
     (it affects how the error propagation happens)
-        0 (default): image is sweeped line per line
-        1: image is sweeped line per line, 
+        1 (default): image is sweeped line per line
+        -1: image is sweeped line per line, 
         but at the end of a line it goes to the nearest neighbor in next line
     """
     masks = (np.array([[0, 0, 7/16], [3/16, 5/16, 1/16]]),
@@ -93,6 +92,6 @@ def halftoning(img, err_method=0, sweep_method=0):
     else:
         print("Damn. That's hard.")
 
-    fs = sweep(img, masks[err_method])
+    fs = sweep(img, masks[err_method], sweep_method)
 
     return fs

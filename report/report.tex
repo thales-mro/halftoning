@@ -45,11 +45,11 @@
   \maketitle
   
   \begin{abstract}
-
+    In this project, it was given the task of creating a halftoning algorithm to generate images in grayscale and color. To fulfill the requirements, the solution applies error diffusion for neighbor pixels on image sweeping, using approaches listed in the literature. It was able to generate the halftoning images in grayscale and color, and the differences of each error diffusion approach, the pros and cons of the implementation are explained in this report.
   \end{abstract}
   
 \section{Introduction}
-Halftoning is a technique which is used for reducing the number of colors used to represent an image, while is desired to keep a good visual perception of its contents for the user. In this work, the implementation of halftoning techniques with error diffusion was realized. For each technique, tests were executed to analyze the quality of the output image, sweeping the image in two different ways. The next section explains the implemented algorithms and the following, the tests done and the discussion.
+Halftoning is a technique used for reducing the number of colors used to represent an image, while is desired to keep a good visual perception of its contents for the user. In this work, the implementation of halftoning techniques with error diffusion was realized. For each technique, tests were executed to analyze the quality of the output image, sweeping the image in two different ways. The next sections explains the implemented algorithm, the experiments realized and the output analysis.
 \\
 The code, along with the input files and the report is delivered in the compressed file THALES\_MATEUS\_RODRIGUES\_OLIVEIRA\_148051.tar, in the Google Classroom.
 \section{The Program}
@@ -58,7 +58,7 @@ The program was implemented with Python 3.7.3. The libraries used and their resp
 
 \subsection{How to execute it}
 
-The project has a Makefile available to help performing some actions on it. The Makefile has 3 basic instructions: clean, build and exec. Clean instruction removes generated images stored in the \textbf{output} folder, the source code in \textbf{bin} folder and the folders itself. The Build instruction creates the \textbf{output} and \textbf{bin} folders, and move execution code to \textbf{bin}. The Exec instruction executes the code with images in the \textbf{input} folder. Listing \ref{code:makefile} provides examples of how to execute the three instructions in a terminal.
+The project has a Makefile available to help performing some actions on it. The Makefile has 3 basic instructions: clean, build and exec. Clean instruction removes generated images stored in the \textbf{output} folder, the execution code in \textbf{bin} folder and the folders itself. The Build instruction creates the \textbf{output} and \textbf{bin} folders, and moves the source code to \textbf{bin}. The Exec instruction executes the code with images in the \textbf{input} folder. Listing \ref{code:makefile} provides examples of how to execute the three instructions in a terminal.
 \begin{lstlisting}[language=sh, caption={Makefile usage example}, label={code:makefile}]
   #clean environment, deletes output and bin folders and their content
   make clean
@@ -85,7 +85,7 @@ The program does not have an input argument by default, the input images are lis
 \end{lstlisting}
 
 \subsection{Output}
-The output of the program is a series of halftoning images based on the input ones, changing the error diffusion methods and the sweeping directions. The output images are stored in the \textbf{output} folder, and the images are labeled by concatenating the image name, whether is colored or grayscale, the error diffusion method and the sweep order (\textit{e.g.: baboon\_colored\_sierra\_left-to-right.png})
+The output of the program is a series of halftoning images based on the input ones, changing the error diffusion methods and the sweeping directions. The output images are stored in the \textbf{output} folder, and they are labeled by concatenating the image name, whether is colored or grayscale, the error diffusion method and the sweep order (\textit{e.g.: baboon\_colored\_sierra\_left-to-right.png})
 
 \subsection{Implementation}
 The function which implements the halftoning operation is defined in the \textit{src/halftoning.py} file. The file contains a dictionary that lists the approaches used for error diffusion, as mentioned in Figure 1 in the project proposal. Listing \ref{code:masks} shows the implemented dictionary.
@@ -167,7 +167,7 @@ def apply_halftoning(img, err_method="floyd-steinberg", sweep_method=1, benchmar
 \end{lstlisting}
 The decisions made in the implementation are explained in the following part.
 \subsubsection{Dealing with sweeping directions}
-In this solution, it was implemented two approaches: sweeping every line from left to right, and alternating directions when changing from one line to the other. Figure \ref{fig:sweepingmodes} shows the approaches. If the second mentioned method is chosen, the error diffusion mask has to be mirroed in the vertical direction. In other to avoid \textit{if-else} statements when deciding whether mask to use for the specific line (the regular or the mirroed one), the tuple \textit{m} holds both masks, and decide which one to use based on the \textit{direction} flag (if \textit{direction} is 1, use the regular mask. If it is -1, use the mirroed one). To sweep the image from right to left, it is also considered the indexes in the loop to decrease. Following the same idea of tuple \textit{m}, the tuple \textit{sweep\_options} is used to set the starting index, the stop index, and the \textit{direction} flag as step.
+In this solution, it was implemented two approaches: sweeping every line from left to right, and alternating directions when changing from one line to the other. Figure \ref{fig:sweepingmodes} shows the approaches. If the second mentioned method is chosen, the error diffusion mask has to be mirroed in the vertical direction. In order to avoid \textit{if-else} statements when deciding which mask to use for the specific line (the regular or the mirroed one), the tuple \textit{m} holds both masks, and decides which one to use based on the \textit{direction} flag (if \textit{direction} is 1, use the regular mask. If it is -1, use the mirroed one). To sweep the image from right to left, it is also considered the indexes in the loop to decrease. Following the same idea of tuple \textit{m}, the tuple \textit{sweep\_options} is used to set the starting index, the stop index, and the \textit{direction} flag as step.
 
 \begin{figure}[H]
   \centering
@@ -178,65 +178,13 @@ In this solution, it was implemented two approaches: sweeping every line from le
 \end{figure}
 
 \subsubsection{Image Padding to deal with borders}
-In order to deal with pixels in the border of the image, to diffuse the error, the image is padded as the mask propagates the error to its neighbors, as they may not exist for pixels in the border. The padding is done based on the mask properties, such as not diffusing errors to already visited pixels and the dimensions of each mask. The values padded does not matter, as they are not visited.
+In order to deal with pixels in the border of the image, to diffuse the error, the image is padded as the mask propagates the error to its neighbors, as they may not exist for pixels in the border. The padding is done based on the mask properties, such as not diffusing errors to already visited pixels and the dimensions of each mask. The values padded do not matter, as they are not visited.
 
 \subsubsection{Defining the value of the pixel and the error diffusion}
-The main ideia of the halftoning algorithm is the following: rather than a simple binarization, in order to create the "feeling" of having more than 2 intensities of a color in the image, an analyzed pixel propagates its information to specific close neighbors. This propagation of information is what we define as error diffusion. Based on a threshold which defines whether a pixel has the maximum or minimum intensity, the resulting pixel value is defined and the error is calculates and passed through specific neighbors with specific weights. That weight is what is defined in the error diffusion masks. The error diffused for the neighbor pixels is proportional to the mentioned weight. After performing these steps to all pixels in the image, the process is done. The steps are the ones inside the two \textit{for} statements in listing \ref{code:halftoning}. They were implemented based on Algorithm 5, presented on the \textit{Enhancement} class of MO443: Introduction to Digital Image Processing course.  
+The main ideia of the halftoning algorithm is the following: rather than a simple binarization, in order to create the "feeling" of having more than 2 intensities of a color in the image, an analyzed pixel propagates its information to specific close neighbors. This propagation of information is what we define as error diffusion. Based on a threshold which defines whether a pixel has the maximum or minimum intensity, the resulting pixel value is defined and the error is calculated and passed through specific neighbors with specific weights. That weight is what is defined in the error diffusion masks. The error diffused for the neighbor pixels is proportional to the mentioned weight. After performing these steps to all pixels in the image, the process is done. The steps are the ones inside the two \textit{for} statements in listing \ref{code:halftoning}. They were implemented based on Algorithm 5, presented on the \textit{Enhancement} class of MO443: Introduction to Digital Image Processing course\cite{CLASS:1}.  
 
 \subsubsection{Sweeping the image}
-To perform the visit of every pixel, as seen in listing \ref{code:halftoning}, it is used two nested \textit{for} statements. As the author was unable to vectorize the error propagation, the execution time occours in the second scale. To define the value of the analyzed pixel in the iteration, an  offset is used, as the pixel is in the middle column related to mask.
-
-
-
-%  \begin{lstlisting}[language=Python, caption={Nearest neighbor interpolation function.}, label={code:nninterpolation}]
-% def resize(img, shape):
-%     ...
-%     # build the new image with shape intended
-%     result = np.zeros(shape[0]*shape[1]*3).reshape(shape[0], shape[1], 3)
-
-%     # get y and x ratios to calculate pixels positions to take
-%     y_ratio = shape[0]/img.shape[0]
-%     x_ratio = shape[1]/img.shape[1]
-
-%     for y in range(shape[0]):
-%         for x in range(shape[1]):
-%             result[y,x] = img[int(y/y_ratio),int(x/x_ratio)]
-
-%     return result.astype(np.uint8)
-% \end{lstlisting}
-
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.4\hsize]{img/o-cv2-a.png}
-%     \includegraphics[width=0.4\hsize]{img/o-nninterpo-a.png}
-%     \includegraphics[width=0.4\hsize]{img/o-cv2-b.png}
-%     \includegraphics[width=0.4\hsize]{img/o-nninterpo-b.png}
-%     \caption{Image results from resizing. Left images: 30x30 and 700x700 images reduced with OpenCV's cubic interpolation. Right images: 30x30 and 700x700 images reduced with our nearest neighbor and Gaussian blur approach}
-%     \label{fig:resize-compare}
-% \end{figure}
-
-% \begin{table}[h!]
-% \centering
-% \begin{center}
-% \begin{tabular}{ |c|c| } 
-%  \hline
-%  Alphabets & Description \\
-%  \hline
-%  {[}'\#', '@', '\%', '=', '*', ':', '-', '.', ' '{]} & Default (required) \\ 
-%  \hline
-%  {[}'W', 'B', 'H', 'T', 'L', 'I', '.', ' '{]}  & Uppercase letters  \\
-%  \hline
-%  {[}'8', '6', '2', '1', '+', '-', '.', ' '{]} & Mathematical  \\ 
-%  \hline
-%  ['\}', ']', '|', '!', '"', ':', '.', ' '] & Vertical \\
-%  \hline
-%  ['\#', '=', '"', '\~','-', '\_', '.', ' '] & Horizontal \\
-%  \hline
-% \end{tabular}
-%  \label{table:alphabet}
-%  \caption{Alphabets used in experiments}
-% \end{center}
-% \end{table}
+To perform the visit of every pixel, as seen in listing \ref{code:halftoning}, it is used two nested \textit{for} statements. As the author was unable to vectorize the error propagation, the execution time occurs on the second scale. To define the value of the analyzed pixel in the iteration, an  offset is used, as the pixel is in the middle column related to mask.
 
 \section{Experiments}
 The \textit{src/main.py} file executes the test pipeline. The idea is the following: for each input image, for each error propagation method, for each sweep order, generate the grayscale and colored halftoning output images. The input images are stored in \textbf{input} folder as mentioned before, and their names and dimensions are listed in table \ref{table:input}. The input images are shown in figure \ref{fig:input-images}
@@ -272,7 +220,7 @@ The \textit{src/main.py} file executes the test pipeline. The idea is the follow
   \label{fig:input-images}
 \end{figure}
 
-The error diffusion approaches are taken from the literature. The listing \ref{code:masks} indicates their dimensions and weights. Table \ref{table:masks} lists the approaches names and the masks dimensions.
+The error diffusion approaches are taken from the literature\cite{CLASS:1}. The listing \ref{code:masks} indicates their dimensions and weights. Table \ref{table:masks} lists the approaches names and the masks dimensions.
 
 \begin{table}[h!]
   \centering
@@ -397,15 +345,83 @@ In the peppers case, the differences are more visible in the colored examples. A
   \label{fig:sweep-watch}
 \end{figure}
 
-The same effects noticed in the peppers image appears here for colored output. Some error is spotted in the "Z arrow" in the image for left to right sweep, while the same error does not appear in the alternate one. Surprisingly, for the grayscale output, the written text in the left-to-right image has better quality than in the alternate one. This happens because of the text orientation in the input image, which has the same bottom to right direction. 
+The same effects noticed in the peppers image appears here for the colored output. Some error is spotted in the "Z arrow" in the image for left to right sweep, while the same error does not appear in the alternate one. Surprisingly, for the grayscale output and Burkes mask, the written text in the left-to-right image has better quality than in the alternate one.
 
-In the majority of cases, the alternate sweep obtained greater quality results, as it tries to compensate the error propagation to both directions. If elements in the image are oriented in the same direction of the error diffusion mask, the results are benefited. 
+In the majority of cases, the alternate sweep obtained greater quality results, as it tries to compensate the error propagation to both directions.
 
 \subsection{Error Diffusion Methods}
+When analyzing the approaches listed in the literature to solve the problem, it is interesting to analyze them side-by-side. To do so, it is chosen colored or grayscale versions of a specific output, and a fixed sweep method, in this case, alternate. Then all solution proposals are grouped. Figures \ref{fig:methods-baboon}, \ref{fig:methods-monalisa}, \ref{fig:methods-peppers} and \ref{fig:methods-watch} shows 6 output images for each input, alternating the error diffusion methods.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_floyd-steinberg_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_stevenson-arce_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_burkes_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_sierra_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_stucki_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_jarvis-judice-ninke_alternate.png}
+  \caption{Baboon images manipulated in experiments. a) Colored by using Floyd and Steiberg, alternate. b) Colored by using Stevenson and Arce, alternate. c) Colored by using Burkes, alternate. d) Colored by using Sierra, alternate. e) Colored by using Stucki, alternate. f) Colored by using Jarvis, Judice and Ninke, alternate. }
+  \label{fig:methods-baboon}
+\end{figure}
+
+For all error diffusion approaches, the main objective is achieved, but each of them have their peculiarity. With Floyd and Steinberg method, we can see the error more clearly as color points that don't fit to their background (yellow and green points in baboon nose, red points in its blue face). Stevenson and Arce highlights the contours, while we have the similar visibility of errors of Floyd and Steinberg. For Burkes, the error is less noticeable, and the contours of baboon face are atenuated a bit, as the mask is short. For Stucki, Sierra and Jarvis, Judice and Ninke, the visibility of errors is also reduced, and the contours are more visible, as the mask is bigger.   
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_floyd-steinberg_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_stevenson-arce_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_burkes_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_sierra_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_stucki_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_jarvis-judice-ninke_alternate.png}
+  \caption{Monalisa images manipulated in experiments. a) Grayscale by using Floyd and Steiberg, alternate. b) Grayscale by using Stevenson and Arce, alternate. c) Grayscale by using Burkes, alternate. d) Grayscale by using Sierra, alternate. e) Grayscale by using Stucki, alternate. f) Grayscale by using Jarvis, Judice and Ninke, alternate. }
+  \label{fig:methods-monalisa}
+\end{figure}
+
+For Monalisa, as the image is smaller, the differences are more difficult to grasp. But is is observable that the Floyd and Steinberg image has more noise than the other ones, and the Stevenson and Arce gives the feeling of having greater contrast. 
+
+The pepper output images have the same characteristics of the baboon image, already listed.
+
+For the watch images, all of them reproduces the image well, being able to distinguish their details, even though the noise feeling is greater in the Floyd and Steinberg approach. All of them fail to reproduce the black background correctly. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_floyd-steinberg_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_stevenson-arce_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_burkes_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_sierra_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_stucki_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_jarvis-judice-ninke_alternate.png}
+  \caption{Peppers images manipulated in experiments. a) Colored by using Floyd and Steiberg, alternate. b) Colored by using Stevenson and Arce, alternate. c) Colored by using Burkes, alternate. d) Colored by using Sierra, alternate. e) Colored by using Stucki, alternate. f) Colored by using Jarvis, Judice and Ninke, alternate. }
+  \label{fig:methods-peppers}
+\end{figure}
+
+ 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_floyd-steinberg_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_stevenson-arce_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_burkes_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_sierra_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_stucki_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_jarvis-judice-ninke_alternate.png}
+  \caption{Watch images manipulated in experiments. a) Grayscale by using Floyd and Steiberg, alternate. b) Grayscale by using Stevenson and Arce, alternate. c) Grayscale by using Burkes, alternate. d) Grayscale by using Sierra, alternate. e) Grayscale by using Stucki, alternate. f) Grayscale by using Jarvis, Judice and Ninke, alternate.}
+  \label{fig:methods-watch}
+\end{figure}
 
 \subsection{Pros and Cons}
+All methods achieve the objective of representing the original image characteristics with only two intensities per channel, each one having its own peculiarity. Floyd and Steinberg images have the least visible quality, as the propagated error is visible in the output, giving the feeling of being \textit{noisy}. Stevenson and Arce images are very interesting, as they highlights the contours of objects in the image. The other methods proposed generate images with great quality, not interfering a lot in its original contours. In general, the technique performs bad when propagating error to uniform spaces, as the blackbackgrounds in our experiments.
+
+Enabling the benchmarking flag, it was able to check the execution time for every output image. For each image channel, the execution time varied from 0.7 seconds for the monalisa image (smallest dimensions) to 9 seconds for the watch image (biggest dimensions), executing in a Intel(R) Core(TM) i7-4720HQ CPU @ 2.60GHz processor. As the technique sweeps through every pixel to do the error diffusion, the execution time is penalyzed.
+
 
 \section{Conclusion}
+The application of halftoning techniques to generate output images with similar characteristics of their inputs with only two levels of color intensity per channel was possible thanks to error propagation through image sweeping.
 
+The usage of different input images, error diffusion techniques and sweep modes made it possible to analyze each approach's strength.
+
+\bibliography{ref-project} 
+\bibliographystyle{ieeetr}
 
 \end{document}

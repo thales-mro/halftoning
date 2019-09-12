@@ -39,7 +39,7 @@
 
 \begin{document}
   \title{Project 1 - Halftoning}
-  \author{Thales Oliveira (RA 148051)
+  \author{Thales Mateus Rodrigues Oliveira (RA 148051)
     \thanks{ra148051@students.ic.unicamp.br}
   }
   \maketitle
@@ -173,8 +173,8 @@ In this solution, it was implemented two approaches: sweeping every line from le
   \centering
   \includegraphics[width=0.4\hsize]{images/sw-left-to-right.png}
   \includegraphics[width=0.4\hsize]{images/sw-alternate.png}
-  \label{fig:sweepingmodes}
   \caption{Left: Sweeping from left to right. Right: Sweeping alternated}
+  \label{fig:sweepingmodes}
 \end{figure}
 
 \subsubsection{Image Padding to deal with borders}
@@ -184,7 +184,9 @@ In order to deal with pixels in the border of the image, to diffuse the error, t
 The main ideia of the halftoning algorithm is the following: rather than a simple binarization, in order to create the "feeling" of having more than 2 intensities of a color in the image, an analyzed pixel propagates its information to specific close neighbors. This propagation of information is what we define as error diffusion. Based on a threshold which defines whether a pixel has the maximum or minimum intensity, the resulting pixel value is defined and the error is calculates and passed through specific neighbors with specific weights. That weight is what is defined in the error diffusion masks. The error diffused for the neighbor pixels is proportional to the mentioned weight. After performing these steps to all pixels in the image, the process is done. The steps are the ones inside the two \textit{for} statements in listing \ref{code:halftoning}. They were implemented based on Algorithm 5, presented on the \textit{Enhancement} class of MO443: Introduction to Digital Image Processing course.  
 
 \subsubsection{Sweeping the image}
-To perform the visit of every pixel, as seen in listing \ref{code:halftoning}, it is used 2 nested \textit{for} statements. As the author was unable to vectorize the error propagation, the execution time occours in the second scale. To defined the value of the analyzed pixel in the iteration, an  offset is used, as the 
+To perform the visit of every pixel, as seen in listing \ref{code:halftoning}, it is used two nested \textit{for} statements. As the author was unable to vectorize the error propagation, the execution time occours in the second scale. To define the value of the analyzed pixel in the iteration, an  offset is used, as the pixel is in the middle column related to mask.
+
+
 
 %  \begin{lstlisting}[language=Python, caption={Nearest neighbor interpolation function.}, label={code:nninterpolation}]
 % def resize(img, shape):
@@ -237,8 +239,115 @@ To perform the visit of every pixel, as seen in listing \ref{code:halftoning}, i
 % \end{table}
 
 \section{Experiments}
+The \textit{src/main.py} file executes the test pipeline. The idea is the following: for each input image, for each error propagation method, for each sweep order, generate the grayscale and colored halftoning output images. The input images are stored in \textbf{input} folder as mentioned before, and their names and dimensions are listed in table \ref{table:input}. The input images are shown in figure \ref{fig:input-images}
+
+\begin{table}[h!]
+\centering
+\begin{center}
+\begin{tabular}{ |c|c| } 
+ \hline
+ Image Names & Dimensions (width x height) \\
+ \hline
+  baboon\_colored.png &  512 x 512\\ 
+ \hline
+  monalisa\_colored.png & 256 x 256\\
+ \hline
+  peppers\_colored.png &  512 x 512\\ 
+ \hline
+  watch\_colored.png & Vertical 1024 x 768\\
+ \hline
+\end{tabular}
+\caption{Input images used in experiments}
+\label{table:input}
+\end{center}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../input/baboon_colored.png}
+  \includegraphics[width=0.4\hsize]{../input/monalisa_colored.png}
+  \includegraphics[width=0.4\hsize]{../input/peppers_colored.png}
+  \includegraphics[width=0.4\hsize]{../input/watch_colored.png}
+  \caption{Input images used in experiments. a) Baboon. b) Monalisa c) Peppers d) Watch}
+  \label{fig:input-images}
+\end{figure}
+
+The error diffusion approaches are taken from the literature. The listing \ref{code:masks} indicates their dimensions and weights. Table \ref{table:masks} lists the approaches names and the masks dimensions.
+
+\begin{table}[h!]
+  \centering
+  \begin{center}
+  \begin{tabular}{ |c|c| } 
+   \hline
+   Error diffusion method & Mask Dimensions (width x height) \\
+   \hline
+    Floyd and Steinberg &  3 x 2\\ 
+   \hline
+    Stevenson and Arce & 7 x 4\\
+   \hline
+    Burkes &  5 x 2\\ 
+   \hline
+    Sierra & 5 x 3\\
+   \hline
+    Stucki & 5 x 3\\
+   \hline
+    Jarvis, Judice and Ninke & 5 x 3 \\ 
+   \hline
+  \end{tabular}
+  \caption{Error diffusion methods used in experiments}
+  \label{table:masks}
+  \end{center}
+  \end{table}
+
+As we have 4 input images, 6 error diffusion methos, 2 sweep modes and it generates 2 output images (grayscale and colored), we have 96 images of output. The output images are stored in the \textbf{output} folder.
 
 \section{Discussion}
+This section is organized in four parts. The first part analyses the output images when compared to the original input. The second part takes into consideration the differences of sweeping modes. The third one does the comparisons between the error propagation methods. To sum up, the pros and cons of the implementation.
+
+\subsection{Effectiveness of the technique}
+In order to check if the premise of the implementation was achieved, the comparison between input and output images is needed. The figures \ref{} places input and output images together, for all the input images used in the experiments.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../input/baboon_colored.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_grayscale_floyd-steinberg_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_jarvis-judice-ninke_alternate.png}
+  \caption{Baboon images manipulated in experiments. a) Input. b) grayscale c) Peppers}
+  \label{fig:effect-baboon}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../input/monalisa_colored.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_stevenson-arce_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_colored_sierra_left-to-right.png}
+  \caption{Monalisa images manipulated in experiments. a) Baboon. b) Monalisa c) Peppers d) Watch}
+  \label{fig:effect-monalisa}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../input/peppers_colored.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_grayscale_stucki_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_burkes_alternate.png}
+  \caption{Peppers images manipulated in experiments. a) Baboon. b) Monalisa c) Peppers d) Watch}
+  \label{fig:effect-peppers}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../input/watch_colored.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_jarvis-judice-ninke_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_colored_floyd-steinberg_alternate.png}
+  \caption{Watch images manipulated in experiments. a) Baboon. b) Monalisa c) Peppers d) Watch}
+  \label{fig:effect-watch}
+\end{figure}
+
+\subsection{Sweeping mode differences}
+
+\subsection{Error Diffusion Methods}
+
+\subsection{Pros and Cons}
 
 \section{Conclusion}
 

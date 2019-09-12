@@ -305,23 +305,25 @@ As we have 4 input images, 6 error diffusion methos, 2 sweep modes and it genera
 This section is organized in four parts. The first part analyses the output images when compared to the original input. The second part takes into consideration the differences of sweeping modes. The third one does the comparisons between the error propagation methods. To sum up, the pros and cons of the implementation.
 
 \subsection{Effectiveness of the technique}
-In order to check if the premise of the implementation was achieved, the comparison between input and output images is needed. The figures \ref{} places input and output images together, for all the input images used in the experiments.
+In order to check if the premise of the implementation was achieved, the comparison between input and output images is needed. The figures \ref{fig:effect-baboon}, \ref{fig:effect-monalisa}, \ref{fig:effect-peppers}, \ref{fig:effect-watch} places input and output images together, for all the input images used in the experiments, showing a variety of methods and sweeping orders. 
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.4\hsize]{../input/baboon_colored.png}
   \includegraphics[width=0.4\hsize]{../output/baboon_grayscale_floyd-steinberg_left-to-right.png}
   \includegraphics[width=0.4\hsize]{../output/baboon_colored_jarvis-judice-ninke_alternate.png}
-  \caption{Baboon images manipulated in experiments. a) Input. b) grayscale c) Peppers}
+  \caption{Baboon images manipulated in experiments. a) Input. b) grayscale by using Floyd and Steinberg, left to right c) colored by using Jarvis, Judice and Ninke, alternate}
   \label{fig:effect-baboon}
 \end{figure}
+
+It is interesting to notice, from those images, that the output images are closely related to the input images, even though it is used only the maximum and minimum values of grayscale and color channels. The error diffusion works well in applying the feeling of having multiple intensities of colors, notwithstanding we can still see points or regions with points in the output (\textit{e.g.:} monalisa (grayscale and colored), baboon (grayscale), peppers (colored)).  
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.4\hsize]{../input/monalisa_colored.png}
   \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_stevenson-arce_alternate.png}
   \includegraphics[width=0.4\hsize]{../output/monalisa_colored_sierra_left-to-right.png}
-  \caption{Monalisa images manipulated in experiments. a) Baboon. b) Monalisa c) Peppers d) Watch}
+  \caption{Monalisa images manipulated in experiments. a) Input. b) grayscale by using Stevenson and Arce, alternate c) Colored by using Sierra, left to right}
   \label{fig:effect-monalisa}
 \end{figure}
 
@@ -330,20 +332,74 @@ In order to check if the premise of the implementation was achieved, the compari
   \includegraphics[width=0.4\hsize]{../input/peppers_colored.png}
   \includegraphics[width=0.4\hsize]{../output/peppers_grayscale_stucki_left-to-right.png}
   \includegraphics[width=0.4\hsize]{../output/peppers_colored_burkes_alternate.png}
-  \caption{Peppers images manipulated in experiments. a) Baboon. b) Monalisa c) Peppers d) Watch}
+  \caption{Peppers images manipulated in experiments. a) Input. b) Grayscale by using Stucki, left to right c) Colored by using Burkes, alternate }
   \label{fig:effect-peppers}
 \end{figure}
+
+Furthermore, the output images maintain the contrast seen in the input ones. It is clear that the error diffusion generates outputs which differs a lot of the process of binarization, in which necessary information of image is lost from the quantization according to a specific threshold. 
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.4\hsize]{../input/watch_colored.png}
   \includegraphics[width=0.4\hsize]{../output/watch_grayscale_jarvis-judice-ninke_left-to-right.png}
   \includegraphics[width=0.4\hsize]{../output/watch_colored_floyd-steinberg_alternate.png}
-  \caption{Watch images manipulated in experiments. a) Baboon. b) Monalisa c) Peppers d) Watch}
+  \caption{Watch images manipulated in experiments. a) Input. b) Grayscale by using Jarvis, Judice and Ninke, left to right. c) Colored by using Floyd and Steinberg, alternate. }
   \label{fig:effect-watch}
 \end{figure}
 
 \subsection{Sweeping mode differences}
+
+For sweeping mode comparisons, an ideia is to place side by side output images related to the same input and same error diffusion method, and comparing them visually. As the report does not include the images in its real dimensions, it is encouraged to the reader to access the images in the \textbf{output} folder for further inspection. Figures \ref{fig:sweep-baboon}, \ref{fig:sweep-monalisa}, \ref{fig:sweep-peppers} and \ref{fig:sweep-watch} shows 4 output images for every input image, created using the two sweep methods, in grayscale and color.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/baboon_grayscale_floyd-steinberg_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_grayscale_floyd-steinberg_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_floyd-steinberg_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/baboon_colored_floyd-steinberg_alternate.png}
+  \caption{Baboon images manipulated in experiments. a) Grayscale by using Floyd and Steinberg, left to right. b) Grayscale by using Floyd and Steinberg, alternate. c) Colored by using Floyd and Steinberg, left to right. d) Colored by using Floyd and Steinberg, alternate.}
+  \label{fig:sweep-baboon}
+\end{figure}
+
+The differences are subtle, which makes it difficult to notice in the report, but by inspecting the original ones it is possible to see, for the baboon image input, that the sweep order from left to right creates more visible error points (\textit{e.g.: }yellow and green\textit{-ish} points are bigger in the nose of the baboon) than the alternate sweep. For their grayscale versions, the differences are harder to notice but the same effect is observable (if image is \textit{zoomed-in}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_stucki_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_grayscale_stucki_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_colored_stucki_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/monalisa_colored_stucki_alternate.png}
+  \caption{Monalisa images manipulated in experiments. a) Grayscale by using Stucki, left to right. b) Grayscale by using Stucki, alternate. c) Colored by using Stucki, left to right. d) Colored by using Stucki, alternate.}
+  \label{fig:sweep-monalisa}
+\end{figure}
+
+As the monalisa image input is smaller compared to the other ones, it is difficult to spot any differences between the sweep methods.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/peppers_grayscale_stevenson-arce_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_grayscale_stevenson-arce_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_stevenson-arce_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/peppers_colored_stevenson-arce_alternate.png}
+  \caption{Peppers images manipulated in experiments. a) Grayscale by using Stevenson and Arce, left to right. b) Grayscale by using Stevenson and Arce, alternate. c) Colored by using Stevenson and Arce, left to right. d) Colored by using Stevenson and Arce, alternate.}
+  \label{fig:sweep-peppers}
+\end{figure}
+
+In the peppers case, the differences are more visible in the colored examples. As the background is black, the error diffusion is clearly spotted in the bottom of the image (green blur). For the left to right sweep, the blur are is bigger than in the alternate sweep, and it has the "bottom-to-right" direction, as expected from the mask characteristics and the sweep order. For the alternate sweep, the blur area is more "self-contained", as the propagation happens from left to right and right to left, so the error is diffused to the boundaries of the pepper itself, giving the feeling of more correctude. The error propagation is also clearer in this image for the grayscale cases, as we can see from the white spots in the black background.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_burkes_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_grayscale_burkes_alternate.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_colored_burkes_left-to-right.png}
+  \includegraphics[width=0.4\hsize]{../output/watch_colored_burkes_alternate.png}
+  \caption{Watch images manipulated in experiments. a) Grayscale by using Burkes, left to right. b) Grayscale by using Burkes, alternate. c) Colored by using Burkes, left to right. d) Colored by using Burkes, alternate.}
+  \label{fig:sweep-watch}
+\end{figure}
+
+The same effects noticed in the peppers image appears here for colored output. Some error is spotted in the "Z arrow" in the image for left to right sweep, while the same error does not appear in the alternate one. Surprisingly, for the grayscale output, the written text in the left-to-right image has better quality than in the alternate one. This happens because of the text orientation in the input image, which has the same bottom to right direction. 
+
+In the majority of cases, the alternate sweep obtained greater quality results, as it tries to compensate the error propagation to both directions. If elements in the image are oriented in the same direction of the error diffusion mask, the results are benefited. 
 
 \subsection{Error Diffusion Methods}
 

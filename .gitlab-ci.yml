@@ -2,7 +2,8 @@ image: adnrv/opencv
 
 # Some variables to make your CI DRY
 variables:
-  FILE: "bin/main.py"
+  FILE1: "bin/main.py"
+  FILE2: "bin/halftoning.py"
 
 before_script:
   # Execute any scripts here before running your code
@@ -18,7 +19,8 @@ build:
     - make build
   artifacts:
     paths:
-      - $FILE
+      - $FILE1
+      - $FILE2
 
 # This stage executes our program (previously compiled)
 exec:
